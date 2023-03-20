@@ -22,18 +22,18 @@ def pregunta_01():
     40
 
     """
-    return
+    return len(tbl0)
 
 
 def pregunta_02():
     """
     ¿Cuál es la cantidad de columnas en la tabla `tbl0.tsv`?
-
     Rta/
     4
-
     """
-    return
+    columns = tbl0.shape[1]
+
+    return columns
 
 
 def pregunta_03():
@@ -50,7 +50,11 @@ def pregunta_03():
     Name: _c1, dtype: int64
 
     """
-    return
+
+    df = pd.read_table('tbl0.tsv')
+    data_c1 = df.groupby('_c1')['_c1'].count()
+
+    return data_c1
 
 
 def pregunta_04():
@@ -65,7 +69,10 @@ def pregunta_04():
     E    4.785714
     Name: _c2, dtype: float64
     """
-    return
+
+    average = tbl0.groupby('_c1')['_c2'].mean()
+
+    return average
 
 
 def pregunta_05():
@@ -82,7 +89,10 @@ def pregunta_05():
     E    9
     Name: _c2, dtype: int64
     """
-    return
+
+    max_items = tbl0.groupby('_c1')['_c2'].max()
+
+    return max_items
 
 
 def pregunta_06():
@@ -94,7 +104,11 @@ def pregunta_06():
     ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
     """
-    return
+
+    unique_values = tbl1['_c4'].drop_duplicates(
+    ).sort_values().str.upper().to_list()
+
+    return unique_values
 
 
 def pregunta_07():
@@ -110,7 +124,9 @@ def pregunta_07():
     E    67
     Name: _c2, dtype: int64
     """
-    return
+    sum_items_c1 = tbl0.groupby('_c1')['_c2'].sum()
+
+    return sum_items_c1
 
 
 def pregunta_08():
@@ -128,7 +144,9 @@ def pregunta_08():
     39   39   E    5  1998-01-26    44
 
     """
-    return
+    tbl0["suma"] = tbl0["_c0"] + tbl0["_c2"]
+
+    return tbl0
 
 
 def pregunta_09():
@@ -146,7 +164,9 @@ def pregunta_09():
     39   39   E    5  1998-01-26  1998
 
     """
-    return
+    tbl0["year"] = tbl0["_c3"].map(lambda x: x.split("-")[0])
+
+    return tbl0
 
 
 def pregunta_10():
@@ -163,7 +183,10 @@ def pregunta_10():
     3   D                  1:2:3:5:5:7
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
     """
-    return
+    table = tbl0.groupby(['_c1']).agg(
+        {'_c2': lambda x: ":".join(map(str, sorted(list(x))))})
+    
+    return table
 
 
 def pregunta_11():
@@ -182,7 +205,10 @@ def pregunta_11():
     38   38      d,e
     39   39    a,d,f
     """
-    return
+    table = tbl1.groupby(['_c0']).agg(
+        {'_c4': lambda x: ",".join(sorted(list(x)))}).reset_index()
+
+    return table
 
 
 def pregunta_12():
@@ -200,7 +226,14 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    return
+    table = pd.merge(tbl0, tbl2, left_on="_c0", right_on="_c0")
+    columns = ['_c5a', '_c5b']
+    table['_c5'] = table[columns].apply(
+        lambda row: ':'.join(row.values.astype(str)), axis=1)
+    table = table.groupby(['_c0']).agg(
+        {'_c5': lambda x: ",".join(sorted(list(x)))}).reset_index()
+
+    return table
 
 
 def pregunta_13():
@@ -217,4 +250,7 @@ def pregunta_13():
     E    275
     Name: _c5b, dtype: int64
     """
-    return
+    table = pd.merge(tbl0, tbl2, left_on="_c0", right_on="_c0")
+    table = table.groupby('_c1')['_c5b'].sum()
+
+    return table
